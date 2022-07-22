@@ -5,7 +5,7 @@ class FlaskAppWrapper(object):
         self.configs(**configs)
 
     def configs(self, **configs):
-        for config, value in configs:
+        for config, value in configs.items():
             self.app.config[config.upper()] = value
 
     def add_endpoint(self, endpoint=None, endpoint_name=None, handler=None, methods=None, *args, **kwargs):
