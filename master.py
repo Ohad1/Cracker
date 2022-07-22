@@ -1,11 +1,9 @@
 from HashValidator import HashValidator
 from flask import Flask, request
 import json
+from FlaskAppWrapper import FlaskAppWrapper
 
-master_app = Flask(__name__)
 
-
-@master_app.get('/crack')
 def crack():
     hashes_arg = request.args.get('hashes')
     hashes = hashes_arg.split(',')
@@ -15,11 +13,10 @@ def crack():
     return json.dumps(hashes, indent=4), 200
 
 
-class Master:
-    def __init__(self, host_url, default_num_of_minions, minions_urls):
+class Master(FlaskAppWrapper):
+    def __init__(self, app, host_url, default_num_of_minions, minions_urls, **configs):
         self.host_url = host_url
         self.default_num_of_minions = default_num_of_minions
         self.minions_urls = minions_urls
-
-    def start_app(self):
-        master_app.run(debug=True)
+        super().__init__(app, **configs)
+        self.add_endpoint('/crack', 'crack', crack)
