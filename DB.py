@@ -1,0 +1,39 @@
+import sqlite3
+import log
+
+
+class DB:
+    def __init__(self, db_conf):
+        self.scheme = db_conf['scheme']
+        self.path = db_conf['path']
+        try:
+            with sqlite3.connect(self.path) as conn:
+                with open(self.scheme) as f:
+                    conn.executescript(f.read())
+        except sqlite3.Error as error:
+            log.logger.error('[DB] Failed to execute startup script', error)
+
+    def find_number(self, hash_str):
+        try:
+            with sqlite3.connect(self.path) as conn:
+                cur = conn.cursor()
+                cur.execute('SELECT number FROM hashes WHERE hash=?', (hash_str,))
+                row = cur.fetchone()
+                if row:
+                    number = row[0]
+                    log.logger.info(f'[DB] Found number: {hash_str} -> {number}')
+                    return number
+                log.logger.info(f'[DB] Hash not found: {hash_str}')
+                return None
+        except sqlite3.Error as error:
+            log.logger.error('[DB] Failed selecting hash', error)
+
+    def insert_hashes(self, hashes):
+        try:
+            with sqlite3.connect(self.path) as conn:
+                cur = conn.cursor()
+                query = 'INSERT INTO hashes (hash, number) VALUES (?, ?)'
+                cur.executemany(query, hashes)
+                conn.commit()
+        except sqlite3.Error as error:
+            log.logger.error('[DB] Failed to insert multiple records into sqlite table', error)

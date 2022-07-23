@@ -16,5 +16,7 @@ if __name__ == '__main__':
         config = json.load(config_json)
     master = Master(master_app,
                     config['default_num_of_minions'],
-                    config['minion_urls'])
+                    config['minion_urls'],
+                    config['db_conf'],
+                    config['cache_size'])
     master.run(host=host, port=port, threaded=True)

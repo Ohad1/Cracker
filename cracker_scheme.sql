@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS hashes (
+    hash TEXT PRIMARY KEY,
+    number TEXT NOT NULL
+);
