@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from concurrent.futures import as_completed
 from requests_futures.sessions import FuturesSession
@@ -12,6 +13,7 @@ class JobExecutor:
     def __init__(self, hashes, minions):
         self.hashes = hashes
         self.minions = minions
+        self.name = 'JOB_EXECUTOR'
 
     def get_ranges(self, num_of_minions):
         return [((self.NUMBER_RANGE ** self.NUMBER_SIZE) * i // num_of_minions,
@@ -29,18 +31,12 @@ class JobExecutor:
         url = f'http://{minion_url}/stop?hash_uuid={hash_uuid}'
         return url
 
-    def execute_job(self, hash_str, minions, ranges):
-        # tasks = [asyncio.create_task(self.call_minion(hash_str, minion, hash_range))
-        #          for minion, hash_range in zip(minions, ranges)]
-        # for res in asyncio.as_completed(tasks):
-        #     compl = await res
-        # print(f'res: {compl} completed at {time.strftime("%X")}')
+    async def execute_job(self, hash_str, minions, ranges):
         session = FuturesSession()
-
         urls_to_uuids = {f'{minion["url"]}': str(uuid4()) for minion in minions}
         requests_urls = [self.format_crack_url(hash_str, minion, hash_range, urls_to_uuids[f'{minion["url"]}']) for
                          minion, hash_range in zip(minions, ranges)]
-        log.logger.warning(str(requests_urls))
+        log.logger.info(f'[{self.name}] {requests_urls = }')
         crack_futures = [session.get(url) for url in requests_urls]
         done_requests = []
         for future in as_completed(crack_futures):
@@ -48,19 +44,19 @@ class JobExecutor:
             url = future.result().request.url
             done_requests.append(url[:url.index('/crack')].replace('http://', ''))
             if 'phone_number' in resp_json:
-                log.logger.info('Stop execution')
+                log.logger.info(f'[{self.name}] Stop execution')
 
                 requests_urls = [self.format_stop_url(minion, urls_to_uuids[f'{minion["url"]}'])
                                  for minion in minions if minion['url'] not in done_requests]
-                log.logger.info(f'{done_requests = }, {requests_urls = }')
+                log.logger.info(f'[{self.name}] {done_requests = }, {requests_urls = }')
                 [session.get(url) for url in requests_urls]
                 session.executor.shutdown(wait=False, cancel_futures=False)
                 return resp_json['phone_number']
+        log.logger.error(f'[{self.name}] Hash computation failed. Invalid range given')
         return {'error': 'Hash computation failed. Invalid range given'}
 
-    def execute_jobs(self):
-        res = []
-        for hash_str in self.hashes:
-            ranges = self.get_ranges(len(self.minions))
-            res.append(self.execute_job(hash_str, self.minions, ranges))
+    async def execute_jobs(self):
+        res = await asyncio.gather(*[self.execute_job(hash_str, self.minions, self.get_ranges(len(self.minions)))
+                                     for hash_str in self.hashes])
+        log.logger.info(f'[{self.name}] {res = }')
         return res
