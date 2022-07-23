@@ -1,10 +1,14 @@
 import hashlib
 import log
+import Constants
+
+
+def get_phone_number(num):
+    filled_num = str(num).zfill(Constants.NUMBER_SIZE)
+    return f'05{filled_num[0]}-{filled_num[1:]}'
 
 
 class HashCracker:
-    NUMBER_SIZE = 8
-
     def __init__(self, start, end, hash_str, hash_uuid):
         self.start = start
         self.end = end
@@ -12,17 +16,13 @@ class HashCracker:
         self.hash_uuid = hash_uuid
         self.is_running = True
 
-    def get_phone_number(self, num):
-        filled_num = str(num).zfill(self.NUMBER_SIZE)
-        return f'05{filled_num[0]}-{filled_num[1:]}'
-
     def crack(self):
         log.logger.debug(f'[{self.hash_uuid}] Cracker started')
         for num in range(self.start, self.end):
             if not self.is_running:
-                log.logger.debug(f'[{self.hash_uuid}] Cracker terminated')
-                return None
-            phone_number = self.get_phone_number(num)
+                log.logger.debug(f'[{self.hash_uuid}] Cracker terminated. reached {num} in range({self.start}, {self.end})')
+                return {'message': f'Cracker {self.hash_uuid} of hash {self.hash_str} was terminated before completion'}
+            phone_number = get_phone_number(num)
             encoded_phone_number = hashlib.md5(phone_number.encode()).hexdigest()
             # log.logger.debug(f'[{self.hash_uuid}] {phone_number = }, {encoded_phone_number = }, {self.hash_str = }')
             if encoded_phone_number == self.hash_str:

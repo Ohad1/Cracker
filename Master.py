@@ -26,10 +26,10 @@ class Master(FlaskAppWrapper):
         missing_hashes = [hash_str for hash_str, number in hashes_to_numbers.items() if not number]
         if not missing_hashes:
             self.storage_manager.update_hashes(hashes_to_numbers)
-            return '\n'.join(hashes_to_numbers.values()), 200
+            return hashes_to_numbers, 200
         job_executor = JobExecutor(missing_hashes, self.minions)
-        numbers = await job_executor.execute_jobs()
-        for missing_hash, number in zip(missing_hashes, numbers):
+        missing_hashes = await job_executor.execute_jobs()
+        for missing_hash, number in missing_hashes.items():
             hashes_to_numbers[missing_hash] = number
-        self.storage_manager.update_hashes(hashes_to_numbers, zip(missing_hashes, numbers))
-        return '\n'.join(hashes_to_numbers.values()), 200
+        self.storage_manager.update_hashes(hashes_to_numbers, list(missing_hashes.items()))
+        return hashes_to_numbers, 200
