@@ -1,5 +1,7 @@
+import json
+
 from flask import Flask
-from master import Master
+from Master import Master
 import sys
 
 if __name__ == '__main__':
@@ -10,7 +12,9 @@ if __name__ == '__main__':
     host, port = url.split(':')
     master_app = Flask(name)
     master_app.debug = True
+    with open('config_prod.json') as config_json:
+        config = json.load(config_json)
     master = Master(master_app,
-                    1,
-                    ['0.0.0.0:5001', '0.0.0.0:5002', '0.0.0.0:5003'])
-    master.run(host=host, port=port)
+                    config['default_num_of_minions'],
+                    config['minion_urls'])
+    master.run(host=host, port=port, threaded=True)

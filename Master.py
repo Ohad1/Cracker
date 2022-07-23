@@ -2,6 +2,7 @@ from flask import request
 from FlaskAppWrapper import FlaskAppWrapper
 from HashValidator import HashValidator
 from JobExecutor import JobExecutor
+import log
 
 
 class Master(FlaskAppWrapper):
@@ -15,6 +16,7 @@ class Master(FlaskAppWrapper):
     def crack(self):
         hashes_arg = request.args.get('hashes')
         hashes = hashes_arg.split(',')
+        log.logger.warning(f'hashes: {hashes}')
         hash_validator = HashValidator(hashes)
         if not hash_validator.validate_hashes():
             return 'Invalid hashes provided', 400

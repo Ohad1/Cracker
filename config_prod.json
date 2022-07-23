@@ -1,5 +1,6 @@
 {
-  "server_url": "0.0.0.0:5000",
-  "minion_urls": ["0.0.0.0:5001", "0.0.0.0:5003", "0.0.0.0:5002"],
-  "default_num_of_minions": 1
+  "server_url": "127.0.0.1:5000",
+  "minion_urls": ["127.0.0.1:5001", "127.0.0.1:5002", "127.0.0.1:5003"],
+  "default_num_of_minions": 2,
+  "log_path": "cracker_app_log.log"
 }

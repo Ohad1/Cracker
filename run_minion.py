@@ -11,4 +11,4 @@ if __name__ == '__main__':
     minion_app = Flask(name)
     minion_app.debug = True
     minion = Minion(minion_app)
-    minion.run(host=host, port=port)
+    minion.run(host=host, port=port, threaded=True)

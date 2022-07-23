@@ -1,8 +1,4 @@
 import json
-
-from flask import Flask
-from master import Master
-import sys
 import subprocess
 
 
