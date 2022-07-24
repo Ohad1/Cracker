@@ -3,7 +3,7 @@ from FlaskAppWrapper import FlaskAppWrapper
 from HashValidator import HashValidator
 from JobExecutor import JobExecutor
 from crack_logger import logger
-from StorageManager import StorageManager
+from DataManager import DataManager
 import multiprocessing
 from run_minion import run_minion
 
@@ -20,7 +20,7 @@ class Master(FlaskAppWrapper):
         self.add_endpoint('/add_entry', 'add_entry', self.add_entry)
         self.minions = {url: multiprocessing.Process(target=run_minion, args=(f'minion_{i + 1}', url))
                         for i, url in enumerate(minions_urls)}
-        self.storage_manager = StorageManager(db_conf, cache_size)
+        self.data_manager = DataManager(db_conf, cache_size)
 
         for minion_proc in list(self.minions.values())[:self.default_num_of_minions]:
             minion_proc.start()
@@ -34,10 +34,10 @@ class Master(FlaskAppWrapper):
         if not hash_validator.validate_hashes():
             return 'Invalid hashes provided', 400
         while retry_count < self.MAX_RETRY_COUNT:
-            hashes_to_numbers = {hash_str: self.storage_manager.find_number(hash_str) for hash_str in hashes}
+            hashes_to_numbers = {hash_str: self.data_manager.find_number(hash_str) for hash_str in hashes}
             missing_hashes = [hash_str for hash_str, number in hashes_to_numbers.items() if not number]
             if not missing_hashes:
-                self.storage_manager.update_hashes(hashes_to_numbers)
+                self.data_manager.update_hashes(hashes_to_numbers)
                 return hashes_to_numbers, 200
             active_minions = [url for url, proc in self.minions.items() if proc.is_alive()]
             job_executor = JobExecutor(missing_hashes, active_minions, self.url)
@@ -61,5 +61,5 @@ class Master(FlaskAppWrapper):
         hash_str = request.args.get('hash_str')
         number = request.args.get('number')
         logger.info(f'[{self.name}] add_entry request received: {hash_str = }, {number = }')
-        self.storage_manager.update_hashes({hash_str: number})
+        self.data_manager.update_hashes({hash_str: number})
         return {'message': 'entered entry successfully'}, 200

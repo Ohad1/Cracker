@@ -2,7 +2,7 @@ from DB import DB
 from LRUCache import LRUCache
 
 
-class StorageManager:
+class DataManager:
     def __init__(self, db_conf, cache_size):
         self.db = DB(db_conf)
         self.cache = LRUCache(cache_size)
