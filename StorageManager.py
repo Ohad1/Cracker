@@ -11,8 +11,7 @@ class StorageManager:
         val = self.cache.get(hash_str)
         return val if val else self.db.find_number(hash_str)
 
-    def update_hashes(self, hashes_to_numbers, missing_hashes=None):
+    def update_hashes(self, hashes_to_numbers):
         for hash_str, number in hashes_to_numbers.items():
             self.cache.put(hash_str, number)
-        if missing_hashes:
-            self.db.insert_hashes(missing_hashes)
+        self.db.insert_hashes(list(hashes_to_numbers.items()))

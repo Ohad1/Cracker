@@ -17,9 +17,10 @@ async def stop_jobs(jobs_to_stop):
 
 
 class JobExecutor:
-    def __init__(self, hashes, minions):
+    def __init__(self, hashes, minions, master_url):
         self.hashes = hashes
         self.minions = minions
+        self.master_url = master_url
         self.name = 'JOB_EXECUTOR'
         self.num_of_minions = len(self.minions)
         self.num_of_hashes = len(self.hashes)
@@ -29,6 +30,10 @@ class JobExecutor:
         return [((Constants.NUMBER_RANGE ** Constants.NUMBER_SIZE) * i // self.num_of_minions,
                  (Constants.NUMBER_RANGE ** Constants.NUMBER_SIZE) * (i + 1) // self.num_of_minions)
                 for i in range(self.num_of_minions)]
+
+    def add_entry(self, hash_str, number):
+        session = FuturesSession()
+        session.get(f'http://{self.master_url}/add_entry?hash_str={hash_str}&number={number}', headers=headers)
 
     async def execute_jobs(self):
         hashes_to_numbers = {}
@@ -51,5 +56,6 @@ class JobExecutor:
                 if jobs_to_stop:
                     await stop_jobs(jobs_to_stop)
                 hashes_to_numbers[job.hash_str] = resp_json['phone_number']
+                self.add_entry(job.hash_str, resp_json['phone_number'])
         log.logger.info(f'[{self.name}] {hashes_to_numbers = }')
         return hashes_to_numbers

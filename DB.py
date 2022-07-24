@@ -29,11 +29,13 @@ class DB:
             log.logger.error('[DB] Failed selecting hash', error)
 
     def insert_hashes(self, hashes):
+        log.logger.info(f'[DB] INSERT {hashes = }')
         try:
             with sqlite3.connect(self.path) as conn:
                 cur = conn.cursor()
-                query = 'INSERT INTO hashes (hash, number) VALUES (?, ?)'
+                query = 'INSERT OR IGNORE INTO hashes (hash, number) VALUES (?, ?)'
                 cur.executemany(query, hashes)
                 conn.commit()
+                log.logger.info(f'[DB] Successfully inserted {cur.rowcount} {"entries" if cur.rowcount != 1 else "entry"}')
         except sqlite3.Error as error:
             log.logger.error('[DB] Failed to insert multiple records into sqlite table', error)
