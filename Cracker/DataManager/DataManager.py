@@ -9,7 +9,12 @@ class DataManager:
 
     def find_number(self, hash_str):
         val = self.cache.get(hash_str)
-        return val if val else self.db.find_number(hash_str)
+        if val:
+            return val
+        number = self.db.find_number(hash_str)
+        if number:
+            self.cache.put(hash_str, number)
+        return number
 
     def update_hashes(self, hashes_to_numbers):
         for hash_str, number in hashes_to_numbers.items():

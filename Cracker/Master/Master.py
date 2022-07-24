@@ -39,7 +39,6 @@ class Master(FlaskAppWrapper):
             hashes_to_numbers = {hash_str: self.data_manager.find_number(hash_str) for hash_str in hashes}
             missing_hashes = [hash_str for hash_str, number in hashes_to_numbers.items() if not number]
             if not missing_hashes:
-                self.data_manager.update_hashes(hashes_to_numbers)
                 return hashes_to_numbers, 200
             active_minions = [url for url, proc in self.minions.items() if proc.is_alive()]
             job_executor = JobExecutor(missing_hashes, active_minions, self.url)
