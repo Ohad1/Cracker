@@ -39,6 +39,6 @@ class Minion(FlaskAppWrapper):
             log.logger.error(f'[{self.name}] No such hash UUID: {hash_uuid}')
             res = {'error': f'No such hash UUID: {hash_uuid}'}
             return res, 400
-        log.logger.error(f'[{self.name}] Stop cracker: {hash_uuid}')
+        log.logger.info(f'[{self.name}] Stop cracker: {hash_uuid}')
         self.hash_uuid_to_cracker[hash_uuid].stop()
         return {'message': f'Cracker {hash_uuid} was stopped'}, 200

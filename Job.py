@@ -6,7 +6,7 @@ import log
 class Job:
     def __init__(self, hash_str, minion, hash_range):
         self.hash_str = hash_str
-        self.minion_url = minion['url']
+        self.minion_url = minion
         self.start, self.end = hash_range
         self.name = f'JOB_{self.hash_str}_{self.start}_{self.end}'
         self.uuid = str(uuid4())
