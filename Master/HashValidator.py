@@ -1,5 +1,5 @@
 import re
-from crack_logger import logger
+from Logger.crack_logger import logger
 
 
 class HashValidator:

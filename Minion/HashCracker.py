@@ -1,5 +1,5 @@
 import hashlib
-from crack_logger import logger
+from Logger.crack_logger import logger
 import Constants
 
 

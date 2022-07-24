@@ -1,5 +1,5 @@
-from DB import DB
-from LRUCache import LRUCache
+from DataManager.DB import DB
+from DataManager.LRUCache import LRUCache
 
 
 class DataManager:

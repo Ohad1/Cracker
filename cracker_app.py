@@ -1,6 +1,7 @@
 import json
 import multiprocessing
-from run_master import run_master
+import Runners
+from Runners.run_master import run_master
 
 
 def cracker_app():

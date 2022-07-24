@@ -1,5 +1,5 @@
 from flask import Flask
-from Master import Master
+from Master.Master import Master
 import sys
 
 
