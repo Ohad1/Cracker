@@ -30,6 +30,8 @@ class Master(FlaskAppWrapper):
         hashes_arg = request.args.get('hashes')
         hashes = hashes_arg.split(',')
         logger.info(f'[{self.name}] crack request received: {hashes = }')
+        if not hashes:
+            return {'error': 'No hashes provided'}, 400
         hash_validator = HashValidator(hashes)
         if not hash_validator.validate_hashes():
             return 'Invalid hashes provided', 400
