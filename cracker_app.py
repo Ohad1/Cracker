@@ -1,6 +1,5 @@
 import json
 import multiprocessing
-import Runners
 from Runners.run_master import run_master
 
 
