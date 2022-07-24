@@ -1,5 +1,4 @@
 from Logger.crack_logger import logger
-import Constants
 from Master.Job import Job
 from concurrent.futures import as_completed
 from requests_futures.sessions import FuturesSession
@@ -16,6 +15,9 @@ async def stop_jobs(jobs_to_stop):
 
 
 class JobExecutor:
+    NUMBER_RANGE = 10
+    NUMBER_SIZE = 8
+
     def __init__(self, hashes, minions, master_url):
         self.hashes = hashes
         self.minions = minions
@@ -26,8 +28,8 @@ class JobExecutor:
         self.max_workers = self.num_of_minions * self.num_of_hashes
 
     def get_ranges(self):
-        return [((Constants.NUMBER_RANGE ** Constants.NUMBER_SIZE) * i // self.num_of_minions,
-                 (Constants.NUMBER_RANGE ** Constants.NUMBER_SIZE) * (i + 1) // self.num_of_minions)
+        return [((self.NUMBER_RANGE ** self.NUMBER_SIZE) * i // self.num_of_minions,
+                 (self.NUMBER_RANGE ** self.NUMBER_SIZE) * (i + 1) // self.num_of_minions)
                 for i in range(self.num_of_minions)]
 
     def add_entry(self, hash_str, number):
