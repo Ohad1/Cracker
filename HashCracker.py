@@ -1,5 +1,5 @@
 import hashlib
-import log
+from crack_logger import logger
 import Constants
 
 
@@ -17,18 +17,18 @@ class HashCracker:
         self.is_running = True
 
     def crack(self):
-        log.logger.debug(f'[{self.hash_uuid}] Cracker started')
+        logger.debug(f'[{self.hash_uuid}] Cracker started')
         for num in range(self.start, self.end):
             if not self.is_running:
-                log.logger.debug(f'[{self.hash_uuid}] Cracker terminated. reached {num} in range({self.start}, {self.end})')
+                logger.debug(f'[{self.hash_uuid}] Cracker terminated. reached {num} in range({self.start}, {self.end})')
                 return {'message': f'Cracker {self.hash_uuid} of hash {self.hash_str} was terminated before completion'}
             phone_number = get_phone_number(num)
             encoded_phone_number = hashlib.md5(phone_number.encode()).hexdigest()
-            # log.logger.debug(f'[{self.hash_uuid}] {phone_number = }, {encoded_phone_number = }, {self.hash_str = }')
+            # logger.debug(f'[{self.hash_uuid}] {phone_number = }, {encoded_phone_number = }, {self.hash_str = }')
             if encoded_phone_number == self.hash_str:
-                log.logger.debug(f'[{self.hash_uuid}] Phone number found: {phone_number}')
+                logger.debug(f'[{self.hash_uuid}] Phone number found: {phone_number}')
                 return phone_number
-        log.logger.debug(f'[{self.hash_uuid}] {self.hash_str} not found in range({self.start}, {self.end})')
+        logger.debug(f'[{self.hash_uuid}] {self.hash_str} not found in range({self.start}, {self.end})')
         return None
 
     def stop(self):

@@ -1,7 +1,7 @@
 from flask import request
 from FlaskAppWrapper import FlaskAppWrapper
 from HashCracker import HashCracker
-import log
+from crack_logger import logger
 
 
 class Minion(FlaskAppWrapper):
@@ -17,28 +17,28 @@ class Minion(FlaskAppWrapper):
         range_end = int(request.args.get('range_end'))
         hash_str = request.args.get('hash_str')
         hash_uuid = request.args.get('hash_uuid')
-        log.logger.debug(f'[{self.name}] {hash_str = }, {range_start = }, {range_end = }, {hash_uuid = }')
+        logger.debug(f'[{self.name}] {hash_str = }, {range_start = }, {range_end = }, {hash_uuid = }')
         hash_cracker = HashCracker(range_start, range_end, hash_str, hash_uuid)
         self.hash_uuid_to_cracker[hash_uuid] = hash_cracker
         ret = hash_cracker.crack()
         if isinstance(ret, str):
             res = {'phone_number': ret}
-            log.logger.debug(f'[{self.name}] {res = }')
+            logger.debug(f'[{self.name}] {res = }')
             return res, 200
         elif isinstance(ret, dict):
-            log.logger.debug(f'[{self.name}] {ret = }')
+            logger.debug(f'[{self.name}] {ret = }')
             return ret, 200
         else:
             res = {'error': f'Hash not found {hash_str = }'}
-            log.logger.debug(f'[{self.name}] {res = }')
+            logger.debug(f'[{self.name}] {res = }')
             return res, 400
 
     def stop(self):
         hash_uuid = request.args.get('hash_uuid')
         if hash_uuid not in self.hash_uuid_to_cracker:
-            log.logger.error(f'[{self.name}] No such hash UUID: {hash_uuid}')
+            logger.error(f'[{self.name}] No such hash UUID: {hash_uuid}')
             res = {'error': f'No such hash UUID: {hash_uuid}'}
             return res, 400
-        log.logger.info(f'[{self.name}] Stop cracker: {hash_uuid}')
+        logger.info(f'[{self.name}] Stop cracker: {hash_uuid}')
         self.hash_uuid_to_cracker[hash_uuid].stop()
         return {'message': f'Cracker {hash_uuid} was stopped'}, 200

@@ -1,5 +1,5 @@
 from collections import OrderedDict
-import log
+from crack_logger import logger
 
 
 class LRUCache:
@@ -15,12 +15,12 @@ class LRUCache:
     # to show that it was recently used.
     def get(self, key):
         if key not in self.cache:
-            log.logger.info(f'[CACHE] Hash not found: {key}')
+            logger.info(f'[CACHE] Hash not found: {key}')
             return None
         else:
             value = self.cache[key]
             self.cache.move_to_end(key)
-            log.logger.info(f'[CACHE] Found number: {key} -> {value}')
+            logger.info(f'[CACHE] Found number: {key} -> {value}')
             return value
 
     # first, we add / update the key by conventional methods.

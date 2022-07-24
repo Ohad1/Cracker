@@ -1,6 +1,6 @@
 
 from uuid import uuid4
-import log
+from crack_logger import logger
 
 
 class Job:
@@ -17,7 +17,7 @@ class Job:
 
     def get_termination_url(self):
         url = f'http://{self.minion_url}/stop?hash_uuid={self.uuid}'
-        log.logger.info(f'[{self.name}] {url = }')
+        logger.info(f'[{self.name}] {url = }')
         return url
 
     def get_execution_url(self):
@@ -25,7 +25,7 @@ class Job:
                f'range_start={self.start}&' \
                f'range_end={self.end}&' \
                f'hash_uuid={self.uuid}'
-        log.logger.info(f'[{self.name}] {url = }')
+        logger.info(f'[{self.name}] {url = }')
         return url
 
     def __str__(self):

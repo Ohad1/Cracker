@@ -1,5 +1,4 @@
-import asyncio
-import log
+from crack_logger import logger
 import Constants
 from Job import Job
 from concurrent.futures import as_completed
@@ -49,17 +48,17 @@ class JobExecutor:
                 resp_json = future.result().json()
                 url = future.result().request.url
                 job = urls_to_jobs[url]
-                log.logger.info(f'[{self.name}] {resp_json = }, {url = }, {str(job) = }')
+                logger.info(f'[{self.name}] {resp_json = }, {url = }, {str(job) = }')
                 job.done()
                 if 'phone_number' in resp_json:
-                    log.logger.info(f'[{self.name}] Stop execution for hash {job.hash_str}')
+                    logger.info(f'[{self.name}] Stop execution for hash {job.hash_str}')
                     jobs_to_stop = [cur_job for cur_job in jobs if
                                     cur_job.hash_str == job.hash_str and not cur_job.is_done]
                     if jobs_to_stop:
                         await stop_jobs(jobs_to_stop)
                     hashes_to_numbers[job.hash_str] = resp_json['phone_number']
                     self.add_entry(job.hash_str, resp_json['phone_number'])
-            log.logger.info(f'[{self.name}] {hashes_to_numbers = }')
+            logger.info(f'[{self.name}] {hashes_to_numbers = }')
             return {'message': hashes_to_numbers}, 200
         except ConnectionResetError:
             return {'error': 'Connection with server was reset'}, 500

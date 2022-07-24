@@ -1,5 +1,6 @@
 import re
-import log
+from crack_logger import logger
+
 
 class HashValidator:
     VALID_HASH_REGEX_EXP = '^[0-9a-fA-F]{32}$'
@@ -12,7 +13,7 @@ class HashValidator:
         match = re.search(self.VALID_HASH_REGEX_EXP, hash_str)
         if match:
             return True
-        log.logger.error(f'[{self.name}] Found invalid hash: {hash_str}')
+        logger.error(f'[{self.name}] Found invalid hash: {hash_str}')
         return True if re.search(self.VALID_HASH_REGEX_EXP, hash_str) else False
 
     def validate_hashes(self):
