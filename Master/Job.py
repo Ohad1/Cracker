@@ -1,6 +1,6 @@
 
 from uuid import uuid4
-from crack_logger import logger
+from Logger.crack_logger import logger
 
 
 class Job:

@@ -1,5 +1,5 @@
-from crack_logger import logger
-import Constants
+from Logger.crack_logger import logger
+from Constants import Constants
 from Job import Job
 from concurrent.futures import as_completed
 from requests_futures.sessions import FuturesSession

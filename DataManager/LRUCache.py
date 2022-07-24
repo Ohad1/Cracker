@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from crack_logger import logger
+from Logger.crack_logger import logger
 
 
 class LRUCache:

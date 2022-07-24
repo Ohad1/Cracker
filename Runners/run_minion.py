@@ -1,5 +1,5 @@
 from flask import Flask
-from Minion import Minion
+from Minion.Minion import Minion
 import sys
 
 

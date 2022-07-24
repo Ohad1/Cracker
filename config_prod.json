@@ -2,7 +2,6 @@
   "server_url": "127.0.0.1:5000",
   "minion_urls": ["127.0.0.1:5001", "127.0.0.1:5002", "127.0.0.1:5003"],
   "default_num_of_minions": 2,
-  "log_path": "cracker_app_log.log",
   "db_conf": {"path": "cracker_prod.db", "scheme":  "cracker_scheme.sql"},
   "cache_size": 128
 }

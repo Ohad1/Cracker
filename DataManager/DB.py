@@ -1,5 +1,5 @@
 import sqlite3
-from crack_logger import logger
+from Logger.crack_logger import logger
 
 
 class DB:

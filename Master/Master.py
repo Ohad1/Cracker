@@ -1,11 +1,11 @@
 from flask import request
-from FlaskAppWrapper import FlaskAppWrapper
+from FlaskAppWrapper.FlaskAppWrapper import FlaskAppWrapper
 from HashValidator import HashValidator
 from JobExecutor import JobExecutor
-from crack_logger import logger
-from DataManager import DataManager
+from Logger.crack_logger import logger
+from DataManager.DataManager import DataManager
 import multiprocessing
-from run_minion import run_minion
+from Runners.run_minion import run_minion
 
 
 class Master(FlaskAppWrapper):

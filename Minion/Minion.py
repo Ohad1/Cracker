@@ -1,7 +1,7 @@
 from flask import request
-from FlaskAppWrapper import FlaskAppWrapper
+from FlaskAppWrapper.FlaskAppWrapper import FlaskAppWrapper
 from HashCracker import HashCracker
-from crack_logger import logger
+from Logger.crack_logger import logger
 
 
 class Minion(FlaskAppWrapper):

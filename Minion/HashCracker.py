@@ -1,6 +1,6 @@
 import hashlib
-from crack_logger import logger
-import Constants
+from Logger.crack_logger import logger
+from Constants import Constants
 
 
 def get_phone_number(num):
