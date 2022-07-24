@@ -1,0 +1,7 @@
+[2022-07-24 20:44:11,614|  INFO| Master.py:32 - crack()] [MASTER] crack request received: hashes = ['ca7f7651600703c1589d38c1193a90f0', 'a4f55ec040e10c3839e54beb78475290']
+[2022-07-24 20:44:11,614|  INFO| LRUCache.py:18 - get()] [CACHE] Hash not found: ca7f7651600703c1589d38c1193a90f0
+[2022-07-24 20:44:11,615|  INFO| DB.py:24 - find_number()] [DB] Found number: ca7f7651600703c1589d38c1193a90f0 -> 055-0000010
+[2022-07-24 20:44:11,615|  INFO| LRUCache.py:18 - get()] [CACHE] Hash not found: a4f55ec040e10c3839e54beb78475290
+[2022-07-24 20:44:11,615|  INFO| DB.py:24 - find_number()] [DB] Found number: a4f55ec040e10c3839e54beb78475290 -> 050-0000007
+[2022-07-24 20:44:11,617|  INFO| DB.py:32 - insert_hashes()] [DB] INSERT hashes = [('ca7f7651600703c1589d38c1193a90f0', '055-0000010'), ('a4f55ec040e10c3839e54beb78475290', '050-0000007')]
+[2022-07-24 20:44:11,617|  INFO| DB.py:39 - insert_hashes()] [DB] Successfully inserted 0 entries
