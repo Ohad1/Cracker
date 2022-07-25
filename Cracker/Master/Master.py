@@ -1,11 +1,11 @@
-from flask import request
+from flask import request, Flask
 from FlaskAppWrapper.FlaskAppWrapper import FlaskAppWrapper
 from Master.HashValidator import HashValidator
 from Master.JobExecutor import JobExecutor
 from Logger.crack_logger import logger
 from DataManager.DataManager import DataManager
 import multiprocessing
-from Runners.run_minion import run_minion
+from Minion.Minion import run_minion
 
 
 class Master(FlaskAppWrapper):
@@ -72,3 +72,15 @@ class Master(FlaskAppWrapper):
         if not ret:
             return {'error': 'Adding hash failed'}, 400
         return {'message': 'entered entry successfully'}, 200
+
+
+def run_master(name, config):
+    host, port = config['server_url'].split(':')
+    master_app = Flask(name)
+    master = Master(master_app,
+                    config['default_num_of_minions'],
+                    config['minion_urls'],
+                    config['db_conf'],
+                    config['cache_size'],
+                    config['server_url'])
+    master.run(host=host, port=port, threaded=True)

@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, Flask
 from FlaskAppWrapper.FlaskAppWrapper import FlaskAppWrapper
 from Minion.HashCracker import HashCracker
 from Logger.crack_logger import logger
@@ -42,3 +42,10 @@ class Minion(FlaskAppWrapper):
         logger.info(f'[{self.name}] Stop cracker: {hash_uuid}')
         self.hash_uuid_to_cracker[hash_uuid].stop()
         return {'message': f'Cracker {hash_uuid} was stopped'}, 200
+
+
+def run_minion(name, url):
+    host, port = url.split(':')
+    minion_app = Flask(name)
+    minion = Minion(minion_app)
+    minion.run(host=host, port=port, threaded=True)

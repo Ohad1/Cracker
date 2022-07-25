@@ -1,6 +1,6 @@
 import json
 import multiprocessing
-from Runners.run_master import run_master
+from Master.Master import run_master
 from pathlib import Path
 import os
 
