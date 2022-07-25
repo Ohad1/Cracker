@@ -3,7 +3,7 @@ from Logger.crack_logger import logger
 
 
 class HashCracker:
-    NUMBER_SIZE = 8
+    NUMBER_LEN = 8
 
     def __init__(self, start, end, hash_str, hash_uuid):
         self.start = start
@@ -13,7 +13,7 @@ class HashCracker:
         self.is_running = True
 
     def get_phone_number(self, num):
-        filled_num = str(num).zfill(self.NUMBER_SIZE)
+        filled_num = str(num).zfill(self.NUMBER_LEN)
         return f'05{filled_num[0]}-{filled_num[1:]}'
 
     def crack(self):

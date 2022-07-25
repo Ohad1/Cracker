@@ -70,16 +70,16 @@ class Master(FlaskAppWrapper):
             logger.error(f'[{self.name}] {err}')
             return err, 400
         if hash_str not in body:
-            err = {'error': 'hash_str not in body'}
+            err = {'error': f'{hash_str = } not in body'}
             logger.error(f'[{self.name}] {err}')
             return err, 400
         number = body[hash_str]
         logger.info(f'[{self.name}] decoded_hashes request received: {hash_str = }, {number = }')
-        ret = self.data_manager.update_hashes({hash_str: number})
+        ret = self.data_manager.insert_hashes({hash_str: number})
         if not ret:
             err = {'error': 'Adding hash failed'}
             logger.error(f'[{self.name}] {err}')
-            return err, 400
+            return err, 500
         logger.info(f'[{self.name}] entered entry successfully: {hash_str = }, {number = }')
         return {'message': 'entered entry successfully'}, 200
 

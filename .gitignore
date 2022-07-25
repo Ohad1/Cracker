@@ -1,2 +1,3 @@
 /Cracker/Logger/*.log
 /Cracker/DataManager/*.db
+/Cracker/cracker_app.log

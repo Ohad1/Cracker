@@ -16,7 +16,7 @@ class DataManager:
             self.cache.put(hash_str, number)
         return number
 
-    def update_hashes(self, hashes_to_numbers):
+    def insert_hashes(self, hashes_to_numbers):
         for hash_str, number in hashes_to_numbers.items():
             self.cache.put(hash_str, number)
         return self.db.insert_hashes(list(hashes_to_numbers.items()))
