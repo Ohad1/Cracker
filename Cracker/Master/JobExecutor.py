@@ -17,6 +17,7 @@ async def stop_jobs(jobs_to_stop):
 class JobExecutor:
     NUMBER_RANGE = 10
     NUMBER_SIZE = 8
+    MAX_WORKERS_COEFFICIENT = 15
 
     def __init__(self, hashes, minions, master_url):
         self.hashes = hashes
@@ -25,7 +26,7 @@ class JobExecutor:
         self.name = 'JOB_EXECUTOR'
         self.num_of_minions = len(self.minions)
         self.num_of_hashes = len(self.hashes)
-        self.max_workers = self.num_of_minions * self.num_of_hashes
+        self.max_workers = self.num_of_minions * max(self.num_of_hashes, self.MAX_WORKERS_COEFFICIENT)
 
     def get_ranges(self):
         return [((self.NUMBER_RANGE ** self.NUMBER_SIZE) * i // self.num_of_minions,
@@ -61,8 +62,8 @@ class JobExecutor:
                     hashes_to_numbers[job.hash_str] = resp_json['phone_number']
                     self.add_entry(job.hash_str, resp_json['phone_number'])
             logger.info(f'[{self.name}] {hashes_to_numbers = }')
-            return {'message': hashes_to_numbers}, 200
+            return {'message': hashes_to_numbers}
         except ConnectionResetError:
-            return {'error': 'Connection with server was reset'}, 500
+            return {'error': 'Connection with server was reset'}
         except Exception as e:
-            return {'error': f'Unknown has occurred: {e}'}, 400
+            return {'error': f'Unknown error has occurred: {e}'}

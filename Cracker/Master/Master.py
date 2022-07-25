@@ -28,13 +28,15 @@ class Master(FlaskAppWrapper):
     async def crack(self):
         retry_count = 0
         hashes_arg = request.args.get('hashes')
+        if not hashes_arg:
+            return {'error': 'hashes parameter not provided'}, 400
         hashes = hashes_arg.split(',')
         logger.info(f'[{self.name}] crack request received: {hashes = }')
         if not hashes:
             return {'error': 'No hashes provided'}, 400
         hash_validator = HashValidator(hashes)
         if not hash_validator.validate_hashes():
-            return 'Invalid hashes provided', 400
+            return {'error': 'Invalid hashes provided'}, 400
         while retry_count < self.MAX_RETRY_COUNT:
             hashes_to_numbers = {hash_str: self.data_manager.find_number(hash_str) for hash_str in hashes}
             missing_hashes = [hash_str for hash_str, number in hashes_to_numbers.items() if not number]
@@ -42,18 +44,18 @@ class Master(FlaskAppWrapper):
                 return hashes_to_numbers, 200
             active_minions = [url for url, proc in self.minions.items() if proc.is_alive()]
             job_executor = JobExecutor(missing_hashes, active_minions, self.url)
-            resp, ret_code = await job_executor.execute_jobs()
+            resp = await job_executor.execute_jobs()
             if 'error' not in resp:
                 cracked_hashes = resp['message']
                 break
             logger.error(f'[{self.name}] Received the following error during execution: {resp["error"]}')
-            if ret_code != 500:
-                return resp, ret_code
+            if resp['error'] != 'Connection with server was reset':
+                return resp, 500
             retry_count += 1
             logger.info(f'[{self.name}] Retry master crack. {retry_count = }')
         if retry_count == self.MAX_RETRY_COUNT:
-            logger.error(f'[{self.name}] MAX_RETRY_COUNT reached {retry_count}, abort exection')
-            return resp, ret_code
+            logger.error(f'[{self.name}] MAX_RETRY_COUNT reached {retry_count}, abort execution')
+            return resp, 500
         for missing_hash, number in cracked_hashes.items():
             hashes_to_numbers[missing_hash] = number
         return hashes_to_numbers, 200
@@ -61,6 +63,12 @@ class Master(FlaskAppWrapper):
     def add_entry(self):
         hash_str = request.args.get('hash_str')
         number = request.args.get('number')
+        if not hash_str:
+            return {'error': 'hash_str not provided'}, 400
+        if not number:
+            return {'error': 'number not provided'}, 400
         logger.info(f'[{self.name}] add_entry request received: {hash_str = }, {number = }')
-        self.data_manager.update_hashes({hash_str: number})
+        ret = self.data_manager.update_hashes({hash_str: number})
+        if not ret:
+            return {'error': 'Adding hash failed'}, 400
         return {'message': 'entered entry successfully'}, 200

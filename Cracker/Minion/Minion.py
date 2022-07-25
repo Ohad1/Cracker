@@ -27,17 +27,10 @@ class Minion(FlaskAppWrapper):
         hash_cracker = HashCracker(range_start, range_end, hash_str, hash_uuid)
         self.hash_uuid_to_cracker[hash_uuid] = hash_cracker
         ret = hash_cracker.crack()
-        if isinstance(ret, str):
-            res = {'phone_number': ret}
-            logger.debug(f'[{self.name}] {res = }')
-            return res, 200
-        elif isinstance(ret, dict):
-            logger.debug(f'[{self.name}] {ret = }')
-            return ret, 200
-        else:
-            res = {'error': f'Hash not found {hash_str = }'}
-            logger.debug(f'[{self.name}] {res = }')
-            return res, 400
+        logger.debug(f'[{self.name}] {ret = }')
+        if 'error' in ret:
+            return ret, 400
+        return ret, 200
 
     def stop(self):
         hash_uuid = request.args.get('hash_uuid')

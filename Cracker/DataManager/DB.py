@@ -37,5 +37,7 @@ class DB:
                 cur.executemany(query, hashes)
                 conn.commit()
                 logger.info(f'[DB] Successfully inserted {cur.rowcount} {"entries" if cur.rowcount != 1 else "entry"}')
+                return True
         except sqlite3.Error as error:
             logger.error('[DB] Failed to insert multiple records into sqlite table', error)
+            return False

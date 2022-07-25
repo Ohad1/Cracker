@@ -26,9 +26,9 @@ class HashCracker:
             encoded_phone_number = hashlib.md5(phone_number.encode()).hexdigest()
             if encoded_phone_number == self.hash_str:
                 logger.debug(f'[{self.hash_uuid}] Phone number found: {phone_number}')
-                return phone_number
+                return {'phone_number': phone_number}
         logger.debug(f'[{self.hash_uuid}] {self.hash_str} not found in range({self.start}, {self.end})')
-        return None
+        return {'error': f'Hash not found {self.hash_str = }'}
 
     def stop(self):
         self.is_running = False
