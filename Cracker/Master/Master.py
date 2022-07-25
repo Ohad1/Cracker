@@ -25,6 +25,14 @@ class Master(FlaskAppWrapper):
         for minion_proc in list(self.minions.values())[:self.default_num_of_minions]:
             minion_proc.start()
 
+    def load_balance_overload(self):
+        inactive_minion = next((proc for proc in self.minions.values() if not proc.is_alive()), None)
+        if inactive_minion:
+            logger.info(f'[{self.name}] found inactive minion, going to activate')
+            inactive_minion.start()
+        else:
+            logger.error(f'[{self.name}] No more available minions')
+
     async def crack(self):
         retry_count = 0
         hashes_arg = request.args.get('hashes')
@@ -50,6 +58,8 @@ class Master(FlaskAppWrapper):
                 break
             logger.error(f'[{self.name}] Received the following error during execution: {resp["error"]}')
             retry_count += 1
+            if 'overload' in resp['error']:
+                self.load_balance_overload()
             logger.info(f'[{self.name}] Retry master crack. {retry_count = }')
         if retry_count == self.MAX_RETRY_COUNT:
             logger.error(f'[{self.name}] MAX_RETRY_COUNT reached {retry_count}, abort execution')
