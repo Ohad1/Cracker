@@ -1,3 +1,5 @@
+from time import sleep
+
 from Logger.crack_logger import logger
 from Master.Job import Job
 from concurrent.futures import as_completed
@@ -35,7 +37,9 @@ class JobExecutor:
 
     def add_entry(self, hash_str, number):
         session = FuturesSession()
-        session.get(f'http://{self.master_url}/add_entry?hash_str={hash_str}&number={number}', headers=headers)
+        session.post(f'http://{self.master_url}/decoded_hashes?hash_str={hash_str}',
+                     headers=headers,
+                     json={hash_str: number})
 
     async def execute_jobs(self):
         try:
@@ -52,7 +56,7 @@ class JobExecutor:
                 url = future.result().request.url
                 job = urls_to_jobs[url]
                 logger.info(f'[{self.name}] {resp_json = }, {url = }, {str(job) = }')
-                job.done()
+                job.stop()
                 if 'phone_number' in resp_json:
                     logger.info(f'[{self.name}] Stop execution for hash {job.hash_str}')
                     jobs_to_stop = [cur_job for cur_job in jobs if

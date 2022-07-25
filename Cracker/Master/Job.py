@@ -12,7 +12,7 @@ class Job:
         self.uuid = str(uuid4())
         self.is_done = False
 
-    def done(self):
+    def stop(self):
         self.is_done = True
 
     def get_termination_url(self):

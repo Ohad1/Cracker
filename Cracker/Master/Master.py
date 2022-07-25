@@ -17,7 +17,7 @@ class Master(FlaskAppWrapper):
         self.url = url
         super().__init__(app, **configs)
         self.add_endpoint('/crack', 'crack', self.crack)
-        self.add_endpoint('/add_entry', 'add_entry', self.add_entry)
+        self.add_endpoint('/decoded_hashes', 'decoded_hashes', self.decoded_hashes, ['POST'])
         self.minions = {url: multiprocessing.Process(target=run_minion, args=(f'minion_{i + 1}', url))
                         for i, url in enumerate(minions_urls)}
         self.data_manager = DataManager(db_conf, cache_size)
@@ -60,17 +60,29 @@ class Master(FlaskAppWrapper):
             hashes_to_numbers[missing_hash] = number
         return hashes_to_numbers, 200
 
-    def add_entry(self):
+    def decoded_hashes(self):
         hash_str = request.args.get('hash_str')
-        number = request.args.get('number')
         if not hash_str:
-            return {'error': 'hash_str not provided'}, 400
-        if not number:
-            return {'error': 'number not provided'}, 400
-        logger.info(f'[{self.name}] add_entry request received: {hash_str = }, {number = }')
+            err = {'error': 'hash_str not provided'}
+            logger.error(f'[{self.name}] {err}')
+            return err, 400
+        body = request.get_json()
+        if not body:
+            err = {'error': 'No JSON provided'}
+            logger.error(f'[{self.name}] {err}')
+            return err, 400
+        if hash_str not in body:
+            err = {'error': 'hash_str not in body'}
+            logger.error(f'[{self.name}] {err}')
+            return err, 400
+        number = body[hash_str]
+        logger.info(f'[{self.name}] decoded_hashes request received: {hash_str = }, {number = }')
         ret = self.data_manager.update_hashes({hash_str: number})
         if not ret:
-            return {'error': 'Adding hash failed'}, 400
+            err = {'error': 'Adding hash failed'}
+            logger.error(f'[{self.name}] {err}')
+            return err, 400
+        logger.info(f'[{self.name}] entered entry successfully: {hash_str = }, {number = }')
         return {'message': 'entered entry successfully'}, 200
 
 
