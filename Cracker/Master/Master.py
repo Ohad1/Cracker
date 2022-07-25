@@ -49,8 +49,6 @@ class Master(FlaskAppWrapper):
                 cracked_hashes = resp['message']
                 break
             logger.error(f'[{self.name}] Received the following error during execution: {resp["error"]}')
-            if resp['error'] != 'Connection with server was reset':
-                return resp, 500
             retry_count += 1
             logger.info(f'[{self.name}] Retry master crack. {retry_count = }')
         if retry_count == self.MAX_RETRY_COUNT:

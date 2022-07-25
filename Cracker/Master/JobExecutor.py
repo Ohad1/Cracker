@@ -1,5 +1,4 @@
-from time import sleep
-
+import requests
 from Logger.crack_logger import logger
 from Master.Job import Job
 from concurrent.futures import as_completed
@@ -42,16 +41,16 @@ class JobExecutor:
                      json={hash_str: number})
 
     async def execute_jobs(self):
-        try:
-            hashes_to_numbers = {}
-            ranges = self.get_ranges()
-            session = FuturesSession(max_workers=self.max_workers)
-            jobs = [Job(hash_str, minion, hash_range)
-                    for hash_str in self.hashes
-                    for minion, hash_range in zip(self.minions, ranges)]
-            urls_to_jobs = {job.get_execution_url(): job for job in jobs}
-            futures = [session.get(url, headers=headers) for url in urls_to_jobs.keys()]
-            for future in as_completed(futures):
+        hashes_to_numbers = {}
+        ranges = self.get_ranges()
+        session = FuturesSession(max_workers=self.max_workers)
+        jobs = [Job(hash_str, minion, hash_range)
+                for hash_str in self.hashes
+                for minion, hash_range in zip(self.minions, ranges)]
+        urls_to_jobs = {job.get_execution_url(): job for job in jobs}
+        futures = [session.get(url, headers=headers) for url in urls_to_jobs.keys()]
+        for future in as_completed(futures):
+            try:
                 resp_json = future.result().json()
                 url = future.result().request.url
                 job = urls_to_jobs[url]
@@ -65,9 +64,15 @@ class JobExecutor:
                         await stop_jobs(jobs_to_stop)
                     hashes_to_numbers[job.hash_str] = resp_json['phone_number']
                     self.add_entry(job.hash_str, resp_json['phone_number'])
-            logger.info(f'[{self.name}] {hashes_to_numbers = }')
-            return {'message': hashes_to_numbers}
-        except ConnectionResetError:
-            return {'error': 'Connection with server was reset'}
-        except Exception as e:
-            return {'error': f'Unknown error has occurred: {e}'}
+            except ConnectionResetError:
+                return {'error': 'Connection with server was reset'}
+            except requests.exceptions.ConnectionError as e:
+                logger.warn(f'[{self.name}] Continue run after ConnectionError: {e.request.url}')
+                pass
+        logger.info(f'[{self.name}] {hashes_to_numbers = }')
+        if len(hashes_to_numbers) != len(self.hashes):
+            return {'error': f'Could not crack all hashes due to overload: '
+                             f'{len(self.hashes)} - {len(hashes_to_numbers)}'
+                             f' = {len(self.hashes) - len(hashes_to_numbers)} hashes are missing'}
+        return {'message': hashes_to_numbers}
+
