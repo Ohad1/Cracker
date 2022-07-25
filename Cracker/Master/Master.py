@@ -64,8 +64,7 @@ class Master(FlaskAppWrapper):
         if retry_count == self.MAX_RETRY_COUNT:
             logger.error(f'[{self.name}] MAX_RETRY_COUNT reached {retry_count}, abort execution')
             return resp, 500
-        for missing_hash, number in cracked_hashes.items():
-            hashes_to_numbers[missing_hash] = number
+        hashes_to_numbers.update(cracked_hashes)
         return hashes_to_numbers, 200
 
     def decoded_hashes(self):
