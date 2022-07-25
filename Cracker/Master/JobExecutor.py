@@ -42,6 +42,7 @@ class JobExecutor:
 
     async def execute_jobs(self):
         hashes_to_numbers = {}
+        failed_connections_uuids = set()
         ranges = self.get_ranges()
         session = FuturesSession(max_workers=self.max_workers)
         jobs = [Job(hash_str, minion, hash_range)
@@ -68,9 +69,16 @@ class JobExecutor:
                 return {'error': 'Connection with server was reset'}
             except requests.exceptions.ConnectionError as e:
                 logger.warn(f'[{self.name}] Continue run after ConnectionError: {e.request.url}')
+                uuid_index = e.request.url.index('hash_uuid=') + len('hash_uuid=')
+                hash_uuid = e.request.url[uuid_index:]
+                failed_connections_uuids.add(hash_uuid)
                 pass
         logger.info(f'[{self.name}] {hashes_to_numbers = }')
         if len(hashes_to_numbers) != len(self.hashes):
+            jobs_to_stop = [cur_job for cur_job in jobs if
+                            cur_job.uuid not in failed_connections_uuids and not cur_job.is_done]
+            if jobs_to_stop:
+                await stop_jobs(jobs_to_stop)
             return {'error': f'Could not crack all hashes due to overload: '
                              f'{len(self.hashes)} - {len(hashes_to_numbers)}'
                              f' = {len(self.hashes) - len(hashes_to_numbers)} hashes are missing'}

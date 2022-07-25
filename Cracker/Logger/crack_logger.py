@@ -3,7 +3,7 @@ from multiprocessing_logging import install_mp_handler
 from pathlib import Path
 import os
 
-log_path = os.path.join(Path(__file__).parent, 'cracker_app.log')
+log_path = os.path.join(Path(__file__).parent.parent, 'cracker_app.log')
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('[%(asctime)s| %(levelname)5s| %(filename)s:%(lineno)s - %(funcName)s()] %(message)s')
